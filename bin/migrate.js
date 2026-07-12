@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
+// Load development.env from the cwd if dotenv is available — most consumers
+// have it. Fail-soft so the CLI still runs in environments without dotenv.
+try {
+  var envName = (process.env.NODE_ENV || 'development') + '.env';
+  require('dotenv').config({ path: require('path').join(process.cwd(), envName) });
+} catch (_) {}
+
 const { create, up, rollback, status, createSeed, seed } = require('../lib/migrator');
+const { resolveConfig } = require('../lib/connection');
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -19,6 +27,25 @@ function parseArgs(argv) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const command = args._[0];
+
+  // Resolve connection config up-front for any command that touches the DB.
+  // The CLI accepts either --connectionName or --connection-name, mapping both
+  // to args.connectionName before passing through to the migrator.
+  if (args['connection-name'] && !args.connectionName) {
+    args.connectionName = args['connection-name'];
+  }
+  const NEEDS_CONFIG = ['up', 'rollback', 'status', 'seed:run'];
+  if (NEEDS_CONFIG.indexOf(command) !== -1) {
+    if (!args.connectionName) {
+      throw new Error('--connectionName (or --connection-name) is required for ' + command);
+    }
+    await resolveConfig(args.connectionName);
+    // Fall back to DB_<NAME> env var if --db wasn't passed (or expanded as
+    // empty by the shell because the var is only set inside development.env).
+    if (!args.db || args.db === true) {
+      args.db = process.env['DB_' + args.connectionName.toUpperCase()] || process.env.DB_NAME;
+    }
+  }
 
   switch (command) {
     case 'create': {
