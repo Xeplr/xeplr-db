@@ -1,14 +1,27 @@
 {
   "name": "@xeplr/db",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Database connection manager, BaseModel, and migration utilities for Knex + Objection.js",
   "main": "index.js",
-  "files": ["index.js", "lib/", "bin/", "config/"],
+  "files": [
+    "index.js",
+    "lib/",
+    "bin/",
+    "config/"
+  ],
   "bin": {
     "xeplr-migrate": "./bin/migrate.js",
     "xeplr-db-encrypt": "./bin/encrypt-config.js"
   },
-  "keywords": ["knex", "objection", "postgres", "database", "migrations", "orm", "multi-tenancy"],
+  "keywords": [
+    "knex",
+    "objection",
+    "postgres",
+    "database",
+    "migrations",
+    "orm",
+    "multi-tenancy"
+  ],
   "author": "xeplr",
   "license": "MIT",
   "repository": {
