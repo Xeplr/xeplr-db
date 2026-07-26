@@ -1,13 +1,9 @@
 #!/usr/bin/env node
 
-// Load development.env from the cwd if dotenv is available — most consumers
-// have it. Fail-soft so the CLI still runs in environments without dotenv.
-try {
-  var envName = (process.env.NODE_ENV || 'development') + '.env';
-  require('dotenv').config({ path: require('path').join(process.cwd(), envName) });
-} catch (_) {}
+// Reads process.env ONLY. The consuming app loads its .env (e.g. via dotenv-cli
+// in the npm script) — @xeplr/* packages never read .env files.
 
-const { create, up, rollback, status, createSeed, seed } = require('../lib/migrator');
+const { create, up, status } = require('../lib/sqlMigrator');
 const { resolveConfig } = require('../lib/connection');
 
 function parseArgs(argv) {
@@ -34,16 +30,22 @@ async function main() {
   if (args['connection-name'] && !args.connectionName) {
     args.connectionName = args['connection-name'];
   }
-  const NEEDS_CONFIG = ['up', 'rollback', 'status', 'seed:run'];
+  const NEEDS_CONFIG = ['up', 'status', 'create-db'];
   if (NEEDS_CONFIG.indexOf(command) !== -1) {
     if (!args.connectionName) {
       throw new Error('--connectionName (or --connection-name) is required for ' + command);
     }
-    await resolveConfig(args.connectionName);
-    // Fall back to DB_<NAME> env var if --db wasn't passed (or expanded as
-    // empty by the shell because the var is only set inside development.env).
+    // The app tells us WHICH secret to use, decoupled from the connection name:
+    //   --connection <encrypted>     the secret itself, or
+    //   --connection-env <ENV_NAME>  the env var holding it (read after dotenv).
+    // Omit both → legacy fallback to <connectionName>_CONNECTION inside resolveConfig.
+    var connSource = args.connection ||
+      (args['connection-env'] && process.env[args['connection-env']]) || undefined;
+    await resolveConfig(args.connectionName, connSource);
+    // db name: --db <name>, or --db-env <ENV_NAME> (app names it), or DB_<connName>.
     if (!args.db || args.db === true) {
-      args.db = process.env['DB_' + args.connectionName.toUpperCase()] || process.env.DB_NAME;
+      args.db = (args['db-env'] && process.env[args['db-env']]) ||
+        process.env['DB_' + args.connectionName.toUpperCase()] || process.env.DB_NAME;
     }
   }
 
@@ -54,27 +56,17 @@ async function main() {
       break;
     }
     case 'up': {
-      const { batch, migrations } = await up(args);
+      const { migrations } = await up(args);
       if (migrations.length === 0) {
         console.log('Already up to date');
       } else {
-        console.log(`Batch ${batch} ran ${migrations.length} migrations:`);
-        migrations.forEach(m => console.log(`  - ${m}`));
-      }
-      break;
-    }
-    case 'rollback': {
-      const { batch, migrations } = await rollback(args);
-      if (migrations.length === 0) {
-        console.log('Nothing to rollback');
-      } else {
-        console.log(`Rolled back ${migrations.length} migrations:`);
+        console.log(`Ran ${migrations.length} migrations:`);
         migrations.forEach(m => console.log(`  - ${m}`));
       }
       break;
     }
     case 'status': {
-      const { completed, pending } = await status(args);
+      const { completed, pending, drift } = await status(args);
       console.log('Completed migrations:');
       completed.forEach(m => console.log(`  ✓ ${m}`));
       if (pending.length) {
@@ -83,40 +75,38 @@ async function main() {
       } else {
         console.log('No pending migrations');
       }
-      break;
-    }
-    case 'seed:create': {
-      const filepath = createSeed(args._[1], { seedsDir: args.seedsDir });
-      console.log(`Created: ${filepath}`);
-      break;
-    }
-    case 'seed:run': {
-      const result = await seed(args);
-      if (!result || result.length === 0) {
-        console.log('No seed files to run');
-      } else {
-        console.log(`Ran ${result.length} seed files:`);
-        result.forEach(s => console.log(`  - ${s}`));
+      if (drift.length) {
+        console.log('WARNING - applied migrations edited after the fact (checksum mismatch):');
+        drift.forEach(m => console.log(`  ! ${m}`));
       }
       break;
     }
+    case 'create-db': {
+      // Reuse ensureDatabase() — same logic the xeplr_config bootstrap uses.
+      const { getResolvedConfig } = require('../lib/connection');
+      const { ensureDatabase } = require('../lib/bootstrap-config');
+      const res = await ensureDatabase(getResolvedConfig(args.connectionName), args.db);
+      console.log(res.created ? ('Created database: ' + args.db) : ('Database already exists: ' + args.db));
+      break;
+    }
     default:
-      console.log('xeplr-migrate - Database migration & seed CLI');
+      console.log('xeplr-migrate - SQL migration CLI');
       console.log('');
       console.log('Commands:');
-      console.log('  create <name>       Create a new migration file');
+      console.log('  create <name>       Create a new (empty) .sql migration file');
+      console.log('  create-db           Create the database if it does not exist');
       console.log('  up                  Run pending migrations');
-      console.log('  rollback            Rollback last batch');
-      console.log('  status              Show migration status');
-      console.log('  seed:create <name>  Create a new seed file');
-      console.log('  seed:run            Run seed files');
+      console.log('  status              Show migration status (completed/pending/drift)');
       console.log('');
       console.log('Options:');
-      console.log('  --db              Database name (required)');
+      console.log('  --db              Database name (falls back to DB_<NAME> env)');
       console.log('  --connectionName  Resolved config name (e.g. api, auth, jobs)');
       console.log('  --dir             Migrations dir (default: ./migrations)');
-      console.log('  --seedsDir        Seeds dir (default: ./seeds)');
-      console.log('  --client          Knex client (default: pg)');
+      console.log('  --extDir          Additional (app) migrations dir, layered per --type');
+      console.log('  --type            precede|succeed|override (default: precede)');
+      console.log('');
+      console.log('Migrations are hand-written .sql files, applied once, no down(). Reference');
+      console.log('env vars in a file as ${VAR_NAME} — substituted at apply time.');
       console.log('');
       console.log('Requires ENCRYPTION_KEY and <NAME>_CONNECTION env vars.');
   }

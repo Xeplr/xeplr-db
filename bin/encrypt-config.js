@@ -6,8 +6,8 @@
  * Usage:
  *   xeplr-db-encrypt --name api --host localhost --port 5432 --user postgres --password mypass
  *
- * Reads ENCRYPTION_KEY from env.
- * Output: the encrypted string to put in <NAME>_CONNECTION env var.
+ * Reads ENCRYPTION_KEY from process.env (the app loads its .env; packages don't).
+ * Output: the encrypted string to put in your connection env var.
  */
 
 var { encrypt } = require('@xeplr/utils/isomorphic/crypto');

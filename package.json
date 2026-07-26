@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Database connection manager, BaseModel, and migration utilities for Knex + Objection.js",
   "main": "index.js",
-  "files": ["index.js", "lib/", "bin/"],
+  "files": ["index.js", "lib/", "bin/", "config/"],
   "bin": {
     "xeplr-migrate": "./bin/migrate.js",
     "xeplr-db-encrypt": "./bin/encrypt-config.js"
