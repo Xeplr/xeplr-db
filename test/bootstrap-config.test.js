@@ -27,7 +27,14 @@ test('bootstrap: creates the DB, runs all migrations, seeds reference data', asy
   var r = await bootstrapConfigDb({ connection: CONN, database: DB });
   try {
     assert.strictEqual(r.created, true);
-    assert.strictEqual(r.migrations.length, 3);   // import_meta, countries, states
+    // EVERY migration in config/migrations ran — counted from the directory
+    // rather than written as a literal. The literal was 3 and the directory
+    // had grown to 5; a test that has to be edited each time a migration is
+    // added ends up asserting how many there used to be.
+    var expected = require('fs')
+      .readdirSync(require('path').join(__dirname, '..', 'config', 'migrations'))
+      .filter(function (f) { return f.endsWith('.js'); }).length;
+    assert.strictEqual(r.migrations.length, expected);
 
     var countries = await r.db('countries').count('* as c');
     var states    = await r.db('states').count('* as c');
