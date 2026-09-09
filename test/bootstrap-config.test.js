@@ -11,7 +11,7 @@ var CONN = {
   host:     process.env.PG_HOST     || 'localhost',
   port:     +(process.env.PG_PORT   || 5435),
   user:     process.env.PG_USER     || 'postgres',
-  password: process.env.PG_PASSWORD || 'l@rocal!Z2t9'
+  password: process.env.PG_PASSWORD || 'postgres'
 };
 var DB = 'xeplr_config_test';
 
