@@ -1,6 +1,6 @@
 {
   "name": "@xeplr/db",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Database connection manager, BaseModel, and migration utilities for Knex + Objection.js",
   "main": "index.js",
   "files": [
