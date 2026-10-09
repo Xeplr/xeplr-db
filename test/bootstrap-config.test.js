@@ -78,3 +78,48 @@ test('reference data has stable ISO natural keys', async function () {
     await r.db.destroy();
   }
 });
+
+test('the standard units are seeded for every app and company, with exact factors', async function () {
+  var r = await bootstrapConfigDb({ connection: CONN, database: DB });
+  try {
+    var t = await r.db('units').where({ code: 't' }).first();
+    assert.strictEqual(t.kind, 'weight');
+    assert.strictEqual(Number(t.factor), 1000, 'a metric ton is 1000 of the weight base (kg)');
+    assert.strictEqual([t.applicationId, t.mtId1, t.mtId2].join(), '*,*,*');
+    var lb = await r.db('units').where({ code: 'lb' }).first();
+    assert.strictEqual(String(lb.factor).replace(/0+$/, ''), '0.45359237', 'a pound exactly, not a float');
+    var kinds = (await r.db('units').distinct('kind')).map(function (k) { return k.kind; }).sort();
+    assert.deepStrictEqual(kinds, ['area', 'energy', 'length', 'time', 'volume', 'weight']);
+    // Every kind has exactly one base unit, factor 1.
+    var bases = await r.db('units').where({ factor: 1 }).select('kind');
+    assert.strictEqual(bases.length, kinds.length);
+  } finally {
+    await r.db.destroy();
+  }
+});
+
+test('an app adds its own migrations with XEPLR_CONFIG_MIGRATIONS — after the library\'s, e.g. a company\'s own unit', async function () {
+  var fs = require('fs'), os = require('os'), path = require('path');
+  var dir = fs.mkdtempSync(path.join(os.tmpdir(), 'xcfg-app-'));
+  // Named 0001 on purpose: it must still run AFTER the library's 0006 (units).
+  fs.writeFileSync(path.join(dir, '0001_testapp_bag.js'),
+    "exports.up = function (knex) { return knex('units').insert({ id: 'u_testapp_bag', code: 'bag', kind: 'weight', label: 'Bag', symbol: 'bag', factor: 50, applicationId: 'testapp', mtId1: 'c1' }); };\n" +
+    "exports.down = function (knex) { return knex('units').where({ id: 'u_testapp_bag' }).delete(); };\n");
+  var before = process.env.XEPLR_CONFIG_MIGRATIONS;
+  process.env.XEPLR_CONFIG_MIGRATIONS = dir;
+  var r;
+  try {
+    r = await bootstrapConfigDb({ connection: CONN, database: DB });
+    var bag = await r.db('units').where({ code: 'bag' }).first();
+    assert.ok(bag && bag.applicationId === 'testapp' && Number(bag.factor) === 50, 'the app\'s row is there');
+    assert.ok(r.migrations.indexOf('0001_testapp_bag.js') !== -1, 'run as a migration of its own');
+  } finally {
+    if (before === undefined) delete process.env.XEPLR_CONFIG_MIGRATIONS; else process.env.XEPLR_CONFIG_MIGRATIONS = before;
+    if (r) await r.db.destroy();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a XEPLR_CONFIG_MIGRATIONS directory that does not exist is an error, not silence', async function () {
+  await assert.rejects(bootstrapConfigDb({ connection: CONN, database: DB, extDir: '/nope/not/here' }), /does not exist/);
+});

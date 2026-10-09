@@ -1,0 +1,330 @@
+[
+ {
+  "id": "u_mg",
+  "code": "mg",
+  "kind": "weight",
+  "label": "Milligram",
+  "symbol": "mg",
+  "factor": "0.000001"
+ },
+ {
+  "id": "u_g",
+  "code": "g",
+  "kind": "weight",
+  "label": "Gram",
+  "symbol": "g",
+  "factor": "0.001"
+ },
+ {
+  "id": "u_kg",
+  "code": "kg",
+  "kind": "weight",
+  "label": "Kilogram",
+  "symbol": "kg",
+  "factor": "1"
+ },
+ {
+  "id": "u_q",
+  "code": "q",
+  "kind": "weight",
+  "label": "Quintal",
+  "symbol": "q",
+  "factor": "100"
+ },
+ {
+  "id": "u_t",
+  "code": "t",
+  "kind": "weight",
+  "label": "Metric ton",
+  "symbol": "t",
+  "factor": "1000"
+ },
+ {
+  "id": "u_oz",
+  "code": "oz",
+  "kind": "weight",
+  "label": "Ounce",
+  "symbol": "oz",
+  "factor": "0.028349523125"
+ },
+ {
+  "id": "u_lb",
+  "code": "lb",
+  "kind": "weight",
+  "label": "Pound",
+  "symbol": "lb",
+  "factor": "0.45359237"
+ },
+ {
+  "id": "u_short_ton",
+  "code": "short_ton",
+  "kind": "weight",
+  "label": "Short ton (US)",
+  "symbol": "sh tn",
+  "factor": "907.18474"
+ },
+ {
+  "id": "u_long_ton",
+  "code": "long_ton",
+  "kind": "weight",
+  "label": "Long ton (UK)",
+  "symbol": "LT",
+  "factor": "1016.0469088"
+ },
+ {
+  "id": "u_mm",
+  "code": "mm",
+  "kind": "length",
+  "label": "Millimetre",
+  "symbol": "mm",
+  "factor": "0.001"
+ },
+ {
+  "id": "u_cm",
+  "code": "cm",
+  "kind": "length",
+  "label": "Centimetre",
+  "symbol": "cm",
+  "factor": "0.01"
+ },
+ {
+  "id": "u_m",
+  "code": "m",
+  "kind": "length",
+  "label": "Metre",
+  "symbol": "m",
+  "factor": "1"
+ },
+ {
+  "id": "u_km",
+  "code": "km",
+  "kind": "length",
+  "label": "Kilometre",
+  "symbol": "km",
+  "factor": "1000"
+ },
+ {
+  "id": "u_in",
+  "code": "in",
+  "kind": "length",
+  "label": "Inch",
+  "symbol": "in",
+  "factor": "0.0254"
+ },
+ {
+  "id": "u_ft",
+  "code": "ft",
+  "kind": "length",
+  "label": "Foot",
+  "symbol": "ft",
+  "factor": "0.3048"
+ },
+ {
+  "id": "u_yd",
+  "code": "yd",
+  "kind": "length",
+  "label": "Yard",
+  "symbol": "yd",
+  "factor": "0.9144"
+ },
+ {
+  "id": "u_mi",
+  "code": "mi",
+  "kind": "length",
+  "label": "Mile",
+  "symbol": "mi",
+  "factor": "1609.344"
+ },
+ {
+  "id": "u_ml",
+  "code": "ml",
+  "kind": "volume",
+  "label": "Millilitre",
+  "symbol": "ml",
+  "factor": "0.001"
+ },
+ {
+  "id": "u_l",
+  "code": "l",
+  "kind": "volume",
+  "label": "Litre",
+  "symbol": "L",
+  "factor": "1"
+ },
+ {
+  "id": "u_kl",
+  "code": "kl",
+  "kind": "volume",
+  "label": "Kilolitre",
+  "symbol": "kL",
+  "factor": "1000"
+ },
+ {
+  "id": "u_m3",
+  "code": "m3",
+  "kind": "volume",
+  "label": "Cubic metre",
+  "symbol": "m³",
+  "factor": "1000"
+ },
+ {
+  "id": "u_gal",
+  "code": "gal",
+  "kind": "volume",
+  "label": "Gallon (US)",
+  "symbol": "gal",
+  "factor": "3.785411784"
+ },
+ {
+  "id": "u_bbl",
+  "code": "bbl",
+  "kind": "volume",
+  "label": "Barrel (oil)",
+  "symbol": "bbl",
+  "factor": "158.987294928"
+ },
+ {
+  "id": "u_m2",
+  "code": "m2",
+  "kind": "area",
+  "label": "Square metre",
+  "symbol": "m²",
+  "factor": "1"
+ },
+ {
+  "id": "u_ft2",
+  "code": "ft2",
+  "kind": "area",
+  "label": "Square foot",
+  "symbol": "ft²",
+  "factor": "0.09290304"
+ },
+ {
+  "id": "u_yd2",
+  "code": "yd2",
+  "kind": "area",
+  "label": "Square yard",
+  "symbol": "yd²",
+  "factor": "0.83612736"
+ },
+ {
+  "id": "u_acre",
+  "code": "acre",
+  "kind": "area",
+  "label": "Acre",
+  "symbol": "ac",
+  "factor": "4046.8564224"
+ },
+ {
+  "id": "u_ha",
+  "code": "ha",
+  "kind": "area",
+  "label": "Hectare",
+  "symbol": "ha",
+  "factor": "10000"
+ },
+ {
+  "id": "u_km2",
+  "code": "km2",
+  "kind": "area",
+  "label": "Square kilometre",
+  "symbol": "km²",
+  "factor": "1000000"
+ },
+ {
+  "id": "u_j",
+  "code": "j",
+  "kind": "energy",
+  "label": "Joule",
+  "symbol": "J",
+  "factor": "0.000000277777777778"
+ },
+ {
+  "id": "u_kcal",
+  "code": "kcal",
+  "kind": "energy",
+  "label": "Kilocalorie",
+  "symbol": "kcal",
+  "factor": "0.001163"
+ },
+ {
+  "id": "u_wh",
+  "code": "wh",
+  "kind": "energy",
+  "label": "Watt-hour",
+  "symbol": "Wh",
+  "factor": "0.001"
+ },
+ {
+  "id": "u_kwh",
+  "code": "kwh",
+  "kind": "energy",
+  "label": "Kilowatt-hour",
+  "symbol": "kWh",
+  "factor": "1"
+ },
+ {
+  "id": "u_mj",
+  "code": "mj",
+  "kind": "energy",
+  "label": "Megajoule",
+  "symbol": "MJ",
+  "factor": "0.277777777777777778"
+ },
+ {
+  "id": "u_mwh",
+  "code": "mwh",
+  "kind": "energy",
+  "label": "Megawatt-hour",
+  "symbol": "MWh",
+  "factor": "1000"
+ },
+ {
+  "id": "u_gj",
+  "code": "gj",
+  "kind": "energy",
+  "label": "Gigajoule",
+  "symbol": "GJ",
+  "factor": "277.777777777777777778"
+ },
+ {
+  "id": "u_gwh",
+  "code": "gwh",
+  "kind": "energy",
+  "label": "Gigawatt-hour",
+  "symbol": "GWh",
+  "factor": "1000000"
+ },
+ {
+  "id": "u_s",
+  "code": "s",
+  "kind": "time",
+  "label": "Second",
+  "symbol": "s",
+  "factor": "0.000277777777777778"
+ },
+ {
+  "id": "u_min",
+  "code": "min",
+  "kind": "time",
+  "label": "Minute",
+  "symbol": "min",
+  "factor": "0.016666666666666667"
+ },
+ {
+  "id": "u_h",
+  "code": "h",
+  "kind": "time",
+  "label": "Hour",
+  "symbol": "h",
+  "factor": "1"
+ },
+ {
+  "id": "u_day",
+  "code": "day",
+  "kind": "time",
+  "label": "Day",
+  "symbol": "d",
+  "factor": "24"
+ }
+]
