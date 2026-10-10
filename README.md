@@ -186,7 +186,17 @@ var { db, created, migrations, seeds } = await bootstrapConfigDb({
 })
 ```
 
-Creates the database if missing, runs the bundled knex migrations (`import_meta`, `countries`, `states`, `applicationId` on every table, `templates`) and seeds countries and states (`seed: false` to skip). Idempotent. It holds no credentials — connection details belong to the consumer.
+Creates the database if missing, runs the bundled knex migrations (`import_meta`, `countries`, `states`, `applicationId` on every table, `templates`, `units`) and seeds countries, states and the standard units (`seed: false` to skip). Idempotent. It holds no credentials; connection details belong to the consumer.
+
+**An app's own migrations run after the library's,** from `XEPLR_CONFIG_MIGRATIONS` (or `extDir`). They are knex `.js` files, each directory in turn (`sortDirsSeparately`), one ledger keyed by file name, so keep app file names distinct. A directory that does not exist is an error. This variable was documented but never read, so an app could not add a row to `xeplr_configs` at all.
+
+**Units** (`units`): a master list every app converts with.
+- **Kind and factor:** each unit has a `kind` (weight, length, volume, area, energy, time) and a `factor` to that kind's base unit, as an exact decimal (`numeric(38,18)`). The bases are kg, m, L, m², kWh and h. Any unit converts to any other of the same kind by the two factors.
+- **Standard units:** 41 of them, in `config/data/units.json`, seeded with `applicationId = mtId1 = mtId2 = '*'`. An upsert on id, so a corrected factor reaches every install.
+- **A company's own units** (e.g. a "bag" of 50 kg) are rows with its `applicationId` and `mtId1`.
+- **Codes:** unique per (application, company, workspace) among live rows.
+
+Migration-directory resolution lives in `lib/directories.js`, which has no dependencies, so this bootstrap does not load the connection layer.
 
 ## CLIs
 
