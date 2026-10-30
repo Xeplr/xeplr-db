@@ -119,6 +119,24 @@ On insert: `recordCreatedDate` / `recordModifiedDate` are set, `isActive` defaul
 
 An app that never calls `registerMTs` gets no tenant filtering. It is process-local state: the API server, the auth service and every worker each register their own.
 
+## Files: a folder per tenant (`dataDir`)
+
+Where any package keeps a tenant's files: under one root, **`XEPLR_DATA_DIR`** (required, absolute, existing — `dataRequiredEnv`), in the folder of the tenant the work runs as. Here, beside the context it reads, so `@xeplr/actions`, `@xeplr/utils`' uploads, `@xeplr/base-apis`, `@xeplr/imports` and `@xeplr/factory` all use one copy.
+
+```
+<XEPLR_DATA_DIR>/<applicationId>/<mtId1>/<mtId2>/…
+```
+
+| `dataDir.` | does |
+|---|---|
+| `resolve(name, what?)` | A name (`bank/inbox/sept.csv`) → its real absolute path in the tenant's folder. A full path is accepted only when already inside. Refused (`PATH_NOT_ALLOWED`): anywhere else, `../`, a symlink pointing out, an address (`http://`, `file://`) |
+| `tenantFolder()` | The folder, made if missing. `*` at a level is `_all`; no tenant, a missing level, or an id that could be a path is refused (`NO_TENANT`) — never the root. No application registered: refused. An app with no tenancy registered is one tenant, `<root>/<app>` |
+| `scratch()` | The tenant's `tmp/` |
+| `nameOf(path)` | A path's name inside the tenant's folder, or `null` — what a screen shows |
+| `requiredEnv` | `['XEPLR_DATA_DIR']` (also exported as `dataRequiredEnv`) |
+
+The tenant comes from the context (a request after its membership is checked, a job, a workflow run) — **never from input**. Missing, relative or absent root: refused by name (`DATA_DIR_UNSET`), because a wrong root that boots reads as empty data.
+
 ## Application scope
 
 A second axis, independent of tenancy.
@@ -238,12 +256,15 @@ Prints the encrypted `{ host, port, user, password }` and a `<NAME>_CONNECTION=�
 | `XEPLR_<APP>_MIGRATIONS` | `migrationsFor(app)` |
 | `DB_<NAME>`, `DB_NAME` | `xeplr-migrate` database-name fallback |
 | any `${VAR}` in a `.sql` file | `sqlMigrator.up` — must be set |
+| `XEPLR_DATA_DIR` | `dataDir` — the root of every tenant's files (`dataRequiredEnv`) |
 
 ## Tests
 
 ```sh
 node --test test/*.test.js
 ```
+
+`data-dir.test.js`: the folder per tenant on a real folder — two companies with the same names, each refused the other's files by full path, `../`, a link and an address; `*`, a missing level, an id that could climb; no application; the root required, absolute, existing.
 
 Integration test for `bootstrapConfigDb` against a live Postgres: creates, migrates, seeds and drops `xeplr_config_test`. Connection from `PG_HOST`, `PG_PORT` (default `5435`), `PG_USER`, `PG_PASSWORD`.
 
