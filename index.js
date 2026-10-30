@@ -19,6 +19,8 @@ const sqlMigrator = require('./lib/sqlMigrator');
 const { bootstrapConfigDb, ensureDatabase } = require('./lib/bootstrap-config');
 // One shared XEPLR_DB_CONNECTION, with a per-service override — see the file.
 const { resolveDbConnection, describeDbConnection } = require('./lib/resolve-connection');
+// Where files are: one root (XEPLR_DATA_DIR), a folder per tenant under it.
+const dataDir = require('./lib/dataDir');
 
 module.exports = {
   resolveConfig,
@@ -46,5 +48,9 @@ module.exports = {
   getMtConfig,
   runWithMt,
   getMtContext,
-  mtMiddleware
+  mtMiddleware,
+  // dataDir.resolve(name), tenantFolder(), scratch(), nameOf(path); its own
+  // requiredEnv (['XEPLR_DATA_DIR']) for an app that keeps files.
+  dataDir,
+  dataRequiredEnv: dataDir.requiredEnv
 };
