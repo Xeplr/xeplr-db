@@ -62,7 +62,7 @@ app.use(mtMiddleware())    // then tenant context from the headers
 
 | export | does |
 |---|---|
-| `getConnection(dbName, dbInfo?, options?)` | Opens (or returns the cached) knex for `dbName` and binds the Objection models to it. `dbInfo` is an encrypted string or a decrypted `{ host, port, user, password }`. Options: `connectionName` (use a config already resolved under that name), `bind` (default `true`; `false` for a secondary connection that must not become the models' knex), `client` (`'pg'`), `pool` (`{ min: 2, max: 10 }`) |
+| `getConnection(dbName, dbInfo?, options?)` | Opens (or returns the cached) knex for `dbName` and binds the Objection models to it. `dbInfo` is an encrypted string or a decrypted `{ host, port, user, password }`. Options: `connectionName` (use a config already resolved under that name), `bind` (default `true`; `false` for a secondary connection that must not become the models' knex), `client` (`'pg'`), `pool` (`{ min: 2, max: 10 }`; a `min` you give is kept as given, `0` included. Under `node --test` — `NODE_TEST_CONTEXT` set — the default `min` is `0` and an idle connection is closed after a second, so many test files running at once do not fill Postgres' connection limit) |
 | `resolveConfig(name, source?)` | Decrypts and caches a login under `name` (case-insensitive). Without `source`, reads `<NAME>_CONNECTION` — a legacy fallback |
 | `resolveDbConnection(serviceVar, { sharedVar, env }?)` | The service's own variable if set, else `XEPLR_DB_CONNECTION`. Throws naming **both** when neither is set |
 | `describeDbConnection(serviceVar, opts?)` | Which variable that would use, or `null` — for a startup log line |
